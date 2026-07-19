@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Prop 8 Reduction Request Helper — Santa Clara County</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%A0%3C/text%3E%3C/svg%3E" />
+<style>
+  :root {
+    --bg: #f4f6f9; --card: #fff; --ink: #1a2433; --muted: #5b6b82;
+    --line: #e1e6ee; --brand: #1f5fa8; --brand-d: #17497f; --good: #1e824c;
+    --warn: #b26a00; --warn-bg: #fff6e5; --bad: #b3261e;
+    --radius: 12px; --shadow: 0 1px 3px rgba(16,32,64,.08), 0 8px 24px rgba(16,32,64,.06);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif; color: var(--ink); background: var(--bg);
+  }
+  header { background: linear-gradient(135deg, var(--brand-d), var(--brand)); color: #fff; padding: 28px 20px; }
+  header .wrap { max-width: 880px; margin: 0 auto; }
+  header h1 { margin: 0 0 4px; font-size: 22px; }
+  header p { margin: 0; opacity: .9; font-size: 14px; }
+  main { max-width: 880px; margin: 22px auto 60px; padding: 0 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+          box-shadow: var(--shadow); padding: 22px; margin-bottom: 20px; }
+  h2 { font-size: 16px; margin: 0 0 14px; }
+  label { display: block; font-weight: 600; font-size: 13px; margin: 0 0 5px; color: var(--ink); }
+  .hint { font-weight: 400; color: var(--muted); font-size: 12px; }
+  input[type=text], input[type=number], select, textarea {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px;
+    font: inherit; background: #fff; color: var(--ink);
+  }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--brand); border-color: var(--brand); }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .field { margin-bottom: 14px; }
+  button { font: inherit; cursor: pointer; border: none; border-radius: 8px; padding: 11px 18px; font-weight: 600; }
+  .primary { background: var(--brand); color: #fff; }
+  .primary:hover { background: var(--brand-d); }
+  .primary:disabled { opacity: .6; cursor: not-allowed; }
+  .ghost { background: #eef2f8; color: var(--brand-d); }
+  .ghost:hover { background: #e2e9f4; }
+  .small { padding: 6px 10px; font-size: 12px; }
+  .copy { background: #eef2f8; color: var(--brand-d); }
+  .copy:hover { background: #dfe8f5; }
+  #results { display: none; }
+  .kv { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .kv:last-child { border-bottom: none; }
+  .kv .k { color: var(--muted); font-size: 13px; }
+  .kv .v { font-weight: 700; font-size: 16px; text-align: right; }
+  .big { font-size: 30px; color: var(--good); }
+  .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px;
+           border-radius: 999px; vertical-align: middle; margin-left: 8px; }
+  .badge.high { background: #e5f6ec; color: var(--good); }
+  .badge.verify { background: var(--warn-bg); color: var(--warn); }
+  .badge.not_found { background: #fdeceb; color: var(--bad); }
+  .bmr { display: inline-block; font-size: 11px; font-weight: 700; color: var(--bad);
+         background: #fdeceb; border-radius: 6px; padding: 1px 6px; margin-top: 4px; cursor: help; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  th { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .03em; }
+  td input { padding: 6px 8px; font-size: 13px; }
+  .comp-table-wrap { overflow-x: auto; }
+  td.num, th.num { text-align: right; }
+  .warn { background: var(--warn-bg); border: 1px solid #f0d9a8; color: #7a4d00;
+          border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; font-size: 13px; }
+  textarea { min-height: 190px; resize: vertical; font-size: 13px; line-height: 1.5; }
+  .comment-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .steps { counter-reset: step; list-style: none; padding: 0; margin: 0; }
+  .steps li { counter-increment: step; padding: 8px 0 8px 38px; position: relative; }
+  .steps li::before { content: counter(step); position: absolute; left: 0; top: 6px;
+     width: 24px; height: 24px; background: var(--brand); color: #fff; border-radius: 50%;
+     text-align: center; line-height: 24px; font-size: 12px; font-weight: 700; }
+  a { color: var(--brand); }
+  .muted { color: var(--muted); font-size: 12px; }
+  .spinner { display: inline-block; width: 15px; height: 15px; border: 2px solid rgba(255,255,255,.4);
+     border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: -2px; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+     background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 13px;
+     opacity: 0; pointer-events: none; transition: opacity .2s; }
+  .toast.show { opacity: 1; }
+  .disclaimer { font-size: 12px; color: var(--muted); }
+  @media (max-width: 620px) { .row, .row3 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Proposition 8 Reduction Request Helper</h1>
+    <p>Santa Clara County &middot; Decline-in-Value (Prop 8) informal review &middot; 2026&ndash;2027</p>
+  </div>
+</header>
+
+<main>
+  <section class="card">
+    <h2>Your property</h2>
+    <form id="form">
+      <div class="field">
+        <label for="address">Property address <span class="hint">street, city, ZIP</span></label>
+        <input type="text" id="address" name="address" required
+               placeholder="e.g. 123 Example St, Sunnyvale, CA 94086" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label for="redfin">Redfin URL <span class="hint">optional — most accurate; auto-fills beds, sq ft, type &amp; APN</span></label>
+        <input type="text" id="redfin" name="redfin_url" placeholder="https://www.redfin.com/CA/Sunnyvale/..." autocomplete="off" />
+      </div>
+      <div class="row3">
+        <div class="field">
+          <label for="ptype">Property type</label>
+          <select id="ptype" name="property_type">
+            <option value="auto" selected>Auto-detect</option>
+            <option value="single_family">Single-family home</option>
+            <option value="townhouse">Townhouse / townhouse-style</option>
+            <option value="condo">Condo (stacked flat)</option>
+            <option value="any">Any</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="beds">Bedrooms <span class="hint">auto</span></label>
+          <input type="number" id="beds" name="beds" min="0" step="1" placeholder="auto" />
+        </div>
+        <div class="field">
+          <label for="sqft">Living area (sq ft) <span class="hint">auto</span></label>
+          <input type="number" id="sqft" name="sqft" min="0" step="1" placeholder="auto" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="assessed">Current assessed value <span class="hint">optional — from your tax bill</span></label>
+        <input type="number" id="assessed" name="assessed_value" min="0" step="1" placeholder="e.g. 1350000" />
+      </div>
+      <button type="submit" class="primary" id="submitBtn">Find comparables &amp; prepare request</button>
+      <p class="muted" style="margin-top:10px">
+        Comparable sales after <strong>March 31, 2026</strong> cannot be considered by the
+        assessor and are automatically excluded.
+      </p>
+    </form>
+  </section>
+
+  <div id="results">
+    <section class="card">
+      <h2>Prepared request</h2>
+      <div id="warnings"></div>
+      <div class="kv">
+        <div class="k">Assessor's Parcel Number (APN)<span id="apnBadge"></span></div>
+        <div class="v" style="display:flex;gap:8px;align-items:center">
+          <span id="apn">—</span>
+          <button class="copy small" data-copy="apn" type="button">Copy</button>
+        </div>
+      </div>
+      <div class="kv">
+        <div class="k">Property address (of record)</div>
+        <div class="v" id="situs" style="font-weight:500">—</div>
+      </div>
+      <div class="kv">
+        <div class="k">Opinion of Value <span class="hint">(average of the 3 comps)</span></div>
+        <div class="v" style="display:flex;gap:10px;align-items:center">
+          <span class="big" id="opinion">—</span>
+          <button class="copy small" data-copy="opinion" type="button">Copy</button>
+        </div>
+      </div>
+      <div class="kv" id="savingsRow" style="display:none">
+        <div class="k">Assessed value vs. supported market value</div>
+        <div class="v" id="savings">—</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="comment-head">
+        <h2 style="margin:0">Comparable sales</h2>
+        <div>
+          <button class="ghost small" id="addComp" type="button">+ Add comp</button>
+          <button class="ghost small" id="refind" type="button">↻ Re-find</button>
+          <button class="primary small" id="recompute" type="button">Recompute value</button>
+        </div>
+      </div>
+      <div id="subjectNote" class="warn" style="display:none;background:#eef4fb;border-color:#cfe0f4;color:#1a3a5c"></div>
+      <p class="muted">Edit any cell — the opinion of value is the average of the sale prices.
+        You can replace scraped comps with your own, or add a suggested alternate below.
+        <strong>Re-find</strong> re-runs the search after you change the type or size above.</p>
+      <div class="comp-table-wrap">
+        <table id="compTable">
+          <thead>
+            <tr>
+              <th>APN or Address</th><th>Date of Sale</th><th class="num">Sale Price</th>
+              <th class="num">Beds</th><th class="num">Sq Ft</th><th class="num">Miles</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="compBody"></tbody>
+        </table>
+      </div>
+      <div id="altWrap" style="display:none;margin-top:16px">
+        <div class="muted" style="font-weight:600;margin-bottom:8px">Other nearby sales you can swap in</div>
+        <div id="altList"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="comment-head">
+        <h2 style="margin:0">Comment for the county form <span class="hint">(&ldquo;Other Information&rdquo;)</span></h2>
+        <button class="copy small" data-copy="comment" type="button">Copy comment</button>
+      </div>
+      <textarea id="comment" spellcheck="false"></textarea>
+    </section>
+
+    <section class="card">
+      <h2>How to file</h2>
+      <ol class="steps">
+        <li>Confirm the <strong>APN</strong> above matches your property tax bill.</li>
+        <li>Go to the Santa Clara County Assessor's online Prop 8 request:
+          <a href="https://asr.santaclaracounty.gov/online-services" target="_blank" rel="noopener">asr.santaclaracounty.gov/online-services</a>.</li>
+        <li>Enter the APN, your contact info, and the <strong>Opinion of Value</strong> above.</li>
+        <li>Add the <strong>3 comparable sales</strong> (APN/address, date, price) exactly as listed.</li>
+        <li>Paste the <strong>comment</strong> into the &ldquo;Other Information&rdquo; box, then submit before the deadline (recommended by <strong>Aug 8</strong>).</li>
+      </ol>
+      <p class="disclaimer">This tool prepares a request from public data and comparable sales for your review.
+        It does not submit anything on your behalf and is not legal or tax advice. Verify every figure before filing.</p>
+    </section>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+let state = { comps: [], alternates: [], property_type: "auto", assessed_value: null, address: "", autofilled: {} };
+
+function toast(msg) {
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 1600);
+}
+function money(n) { return n == null || n === "" ? "—" : "$" + Number(n).toLocaleString("en-US"); }
+
+function num(v) { const n = parseFloat(String(v).replace(/[^0-9.]/g, "")); return isNaN(n) ? null : n; }
+
+function compRow(c, i) {
+  const tr = document.createElement("tr");
+  const addr = c.apn ? `${c.apn}, ${c.address || ""}${c.city ? ", " + c.city : ""}` : `${c.address || ""}${c.city ? ", " + c.city : ""}`;
+  const bmr = c.outlier ? `<div class="bmr" title="${(c.outlier_reason||'').replace(/"/g,'&quot;')}">⚠ possible BMR / outlier</div>` : "";
+  tr.innerHTML = `
+    <td><input data-i="${i}" data-f="address_full" type="text" value="${(addr || "").replace(/"/g, "&quot;").trim().replace(/^,\s*/, "")}">${bmr}</td>
+    <td><input data-i="${i}" data-f="sold_date_display" type="text" style="width:92px" value="${c.sold_date_display || ""}"></td>
+    <td class="num"><input data-i="${i}" data-f="price" class="num" type="text" style="width:104px;text-align:right" value="${c.price != null ? Number(c.price).toLocaleString("en-US") : ""}"></td>
+    <td class="num"><input data-i="${i}" data-f="beds" type="text" style="width:52px;text-align:right" value="${c.beds ?? ""}"></td>
+    <td class="num"><input data-i="${i}" data-f="sqft" type="text" style="width:64px;text-align:right" value="${c.sqft ?? ""}"></td>
+    <td class="num">${c.distance_miles != null ? c.distance_miles.toFixed(2) : "—"}</td>
+    <td><button class="ghost small" type="button" data-del="${i}">✕</button></td>`;
+  return tr;
+}
+
+function renderComps() {
+  const body = $("#compBody"); body.innerHTML = "";
+  state.comps.forEach((c, i) => body.appendChild(compRow(c, i)));
+}
+
+function altLabel(c) {
+  const bits = [c.address];
+  if (c.city) bits.push(c.city);
+  const meta = [];
+  if (c.sold_date_display) meta.push(c.sold_date_display);
+  if (c.price != null) meta.push("$" + Number(c.price).toLocaleString("en-US"));
+  if (c.sqft) meta.push(c.sqft + " sf");
+  if (c.beds) meta.push(c.beds + " bd");
+  if (c.distance_miles != null) meta.push(c.distance_miles.toFixed(2) + " mi");
+  const flag = c.outlier ? ` <span class="bmr" title="${(c.outlier_reason||'').replace(/"/g,'&quot;')}">⚠ BMR?</span>` : "";
+  return `${bits.join(", ")} — ${meta.join(" · ")}${flag}`;
+}
+
+function renderAlternates() {
+  const wrap = $("#altWrap"), list = $("#altList");
+  if (!state.alternates.length) { wrap.style.display = "none"; return; }
+  wrap.style.display = "block";
+  list.innerHTML = "";
+  state.alternates.forEach((c, i) => {
+    const row = document.createElement("div");
+    row.className = "kv"; row.style.padding = "8px 0";
+    row.innerHTML = `<div class="k" style="font-size:12px">${altLabel(c)}</div>
+      <button class="ghost small" type="button" data-alt="${i}">+ Add</button>`;
+    list.appendChild(row);
+  });
+}
+
+function readCompsFromTable() {
+  // Merge edited fields back into state.comps.
+  document.querySelectorAll("#compBody input").forEach((inp) => {
+    const i = +inp.dataset.i, f = inp.dataset.f, v = inp.value;
+    const c = state.comps[i]; if (!c) return;
+    if (f === "address_full") {
+      // Split "APN, address" if an APN-looking token leads.
+      const m = v.match(/^\s*(\d{3}-\d{2}-\d{3})\s*,\s*(.*)$/);
+      if (m) { c.apn = m[1]; c.address = m[2]; } else { c.apn = null; c.address = v; }
+    } else if (f === "price") { c.price = num(v); }
+    else if (f === "beds") { c.beds = num(v); }
+    else if (f === "sqft") { c.sqft = num(v); }
+    else { c[f] = v; }
+  });
+}
+
+function renderResults(data) {
+  state.comps = data.comps || [];
+  state.alternates = data.alternates || [];
+  $("#results").style.display = "block";
+
+  // Warnings
+  const w = $("#warnings"); w.innerHTML = "";
+  (data.warnings || []).forEach((msg) => {
+    const d = document.createElement("div"); d.className = "warn"; d.textContent = msg; w.appendChild(d);
+  });
+
+  // APN
+  const p = data.parcel || {};
+  $("#apn").textContent = p.apn || "Enter manually";
+  $("#situs").textContent = p.situs_address || (data.geocode ? data.geocode.matched_address : "—");
+  const badge = $("#apnBadge");
+  const conf = p.confidence || "not_found";
+  const labels = { high: "confirmed", verify: "verify", not_found: "not found" };
+  badge.className = "badge " + conf;
+  badge.textContent = labels[conf] || conf;
+
+  // Subject: auto-fill empty size/beds fields and show what was detected.
+  const s = data.subject;
+  const sn = $("#subjectNote");
+  // Auto-fill empty fields and remember what we set, so editing the address
+  // later clears our stale auto-fills (but never the user's own entries).
+  state.autofillAddress = state.address;  // the address these auto-fills are for
+  const autofill = (id, val) => {
+    const el = $("#" + id);
+    if (el && !el.value) { el.value = val; state.autofilled[id] = String(val); }
+  };
+  if (s && s.redfin_url) autofill("redfin", s.redfin_url);
+  if (s && s.assessed_value) autofill("assessed", Math.round(s.assessed_value));
+  if (s && (s.sqft || s.beds || s.property_type_label)) {
+    if (s.beds != null) autofill("beds", s.beds);
+    if (s.sqft != null) autofill("sqft", s.sqft);
+    if ($("#ptype").value === "auto" && s.property_type && s.property_type !== "any") {
+      $("#ptype").value = s.property_type; state.autofilled.ptype = s.property_type;
+    }
+    const bits = [];
+    if (s.property_type_label) bits.push(s.property_type_label);
+    if (s.beds != null) bits.push(`${s.beds} bd`);
+    if (s.baths != null) bits.push(`${s.baths} ba`);
+    if (s.sqft != null) bits.push(`${Number(s.sqft).toLocaleString("en-US")} sq ft`);
+    if (s.assessed_value) bits.push(`assessed ${money(Math.round(s.assessed_value))}${s.roll_year ? " ("+s.roll_year+")" : ""}`);
+    const link = s.redfin_url
+      ? ` <a href="${s.redfin_url}" target="_blank" rel="noopener">Open Redfin listing ↗</a>` : "";
+    sn.innerHTML = `<strong>Subject detected:</strong> ${bits.join(" · ")}` +
+      (s.source_note ? ` <span class="muted">— ${s.source_note}</span>` : "") + link +
+      ` <span class="muted">Adjust type/size above and click Re-find to refine comps.</span>`;
+    sn.style.display = "block";
+  } else {
+    sn.innerHTML = `<strong>Couldn't auto-detect the property's size/type.</strong> ` +
+      `Enter bedrooms, living area, and type above (or paste a Redfin URL), then click Re-find.`;
+    sn.style.display = "block";
+  }
+
+  // Opinion + savings
+  $("#opinion").textContent = money(data.opinion_of_value);
+  const sr = $("#savingsRow");
+  if (data.assessed_value && data.opinion_of_value && data.assessed_value > data.opinion_of_value) {
+    const diff = data.assessed_value - data.opinion_of_value;
+    const pct = Math.round((diff / data.assessed_value) * 100);
+    $("#savings").textContent = `${money(data.assessed_value)} → ${money(data.opinion_of_value)}  (−${money(diff)}, −${pct}%)`;
+    sr.style.display = "flex";
+  } else { sr.style.display = "none"; }
+
+  renderComps();
+  renderAlternates();
+  $("#comment").value = data.comment || "";
+  $("#results").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+async function recompute() {
+  readCompsFromTable();
+  const payload = {
+    address: state.address || "n/a",
+    property_type: state.property_type,
+    assessed_value: state.assessed_value,
+    comps: state.comps,
+  };
+  const r = await fetch("/api/recompute", {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
+  });
+  const data = await r.json();
+  state.comps = data.comps;
+  $("#opinion").textContent = money(data.opinion_of_value);
+  $("#comment").value = data.comment || "";
+  renderComps();
+  toast("Recomputed");
+}
+
+function clearStaleAutofills() {
+  for (const [id, val] of Object.entries(state.autofilled)) {
+    const el = $("#" + id);
+    if (el && el.value === String(val)) el.value = (id === "ptype") ? "auto" : "";
+  }
+  state.autofilled = {};
+  state.autofillAddress = null;
+}
+
+async function runPrepare(btn) {
+  // Guarantee: never submit auto-filled values from a different property.
+  if ($("#address").value.trim() !== state.autofillAddress) clearStaleAutofills();
+  const orig = btn ? btn.textContent : "";
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Working…'; }
+  state.property_type = $("#ptype").value;
+  state.assessed_value = num($("#assessed").value);
+  state.address = $("#address").value.trim();
+  const payload = {
+    address: state.address,
+    property_type: state.property_type,
+    beds: num($("#beds").value),
+    sqft: num($("#sqft").value),
+    assessed_value: state.assessed_value,
+    redfin_url: $("#redfin").value.trim() || null,
+  };
+  try {
+    const r = await fetch("/api/prepare", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
+    });
+    if (!r.ok) throw new Error("Server error " + r.status);
+    renderResults(await r.json());
+  } catch (err) {
+    toast("Something went wrong: " + err.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = orig; }
+  }
+}
+
+$("#form").addEventListener("submit", (e) => { e.preventDefault(); runPrepare($("#submitBtn")); });
+$("#refind").addEventListener("click", (e) => runPrepare(e.target));
+
+// Editing the address invalidates auto-detected fields from the previous
+// property — clear the ones we auto-filled (leave user-entered values alone).
+$("#address").addEventListener("input", () => {
+  if ($("#address").value.trim() !== state.autofillAddress) clearStaleAutofills();
+});
+
+$("#recompute").addEventListener("click", recompute);
+$("#addComp").addEventListener("click", () => {
+  readCompsFromTable();
+  state.comps.push({ address: "", sold_date_display: "", price: null, beds: null, sqft: null, distance_miles: null });
+  renderComps();
+});
+$("#compBody").addEventListener("click", (e) => {
+  const del = e.target.closest("[data-del]");
+  if (del) { readCompsFromTable(); state.comps.splice(+del.dataset.del, 1); renderComps(); }
+});
+$("#altList").addEventListener("click", (e) => {
+  const add = e.target.closest("[data-alt]"); if (!add) return;
+  readCompsFromTable();
+  const i = +add.dataset.alt;
+  const [picked] = state.alternates.splice(i, 1);
+  state.comps.push(picked);
+  renderComps(); renderAlternates();
+  recompute();
+});
+
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-copy]"); if (!b) return;
+  const kind = b.dataset.copy;
+  let text = "";
+  if (kind === "apn") text = $("#apn").textContent;
+  else if (kind === "opinion") text = String(($("#opinion").textContent || "").replace(/[^0-9]/g, ""));
+  else if (kind === "comment") text = $("#comment").value;
+  navigator.clipboard.writeText(text).then(() => toast("Copied"));
+});
+</script>
+</body>
+</html>
