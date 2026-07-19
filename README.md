@@ -1,5 +1,9 @@
 # Prop 8 Reduction Request Helper (Santa Clara County)
 
+**Live:** https://prop8-helper-7f167f16.azurewebsites.net
+(Azure Web App for Containers, West US 3.)
+
+
 A web app that prepares an **Informal Proposition 8 (Decline-in-Value) Reduction
 Request** from a street address. Given an address it:
 
@@ -139,13 +143,23 @@ echo "https://$APP.azurewebsites.net"
 The container reads `$PORT` (Azure sets it) and defaults to 8000 locally.
 Health check: `GET /healthz`.
 
-> **Note on scraping from Azure:** Redfin's comparable-sales endpoint may block
-> datacenter IPs. If it does, the app degrades gracefully — the APN and geocode
-> still work, and the user is prompted to enter the 3 comps manually (the
-> opinion of value and comment recompute from whatever comps are present).
-> If blocks are frequent in production, route the Redfin call through a
-> residential/rotating proxy (set via a custom `httpx` transport) or replace the
-> comps provider with a licensed data API.
+> **Observed behaviour from the Azure datacenter IP:** geocoding, the county
+> APN lookup, the Redfin **comparable-sales** feed (`gis-csv`), and the search
+> engine used to *find* a property's Redfin page all work. Redfin's **property
+> page** fetch (used to read the exact APN + assessed value for brand-new
+> construction the county layer lacks) is rate-limited from datacenter IPs, so
+> that step degrades gracefully: the app shows the county APN with a "verify"
+> flag, surfaces the found Redfin listing link, and still returns comps + an
+> opinion of value. To make the page fetch reliable in production, route it
+> through a residential/rotating proxy (custom `httpx` transport) or use a
+> licensed data API.
+
+### Redeploying after a code change
+
+```bash
+az acr build -r <acr-name> -t prop8-helper:latest .
+az webapp restart -n <app-name> -g prop8-rg
+```
 
 ## Configuration (environment variables)
 
