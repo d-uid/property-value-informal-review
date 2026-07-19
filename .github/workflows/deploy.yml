@@ -1,0 +1,70 @@
+name: Build and deploy to Azure
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  RESOURCE_GROUP: prop8-rg
+  ACR_NAME: prop8acr7f167f16
+  WEBAPP_NAME: prop8-helper-7f167f16
+  IMAGE: prop8-helper
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deps
+        run: pip install -r requirements.txt pytest
+      - name: Run tests
+        run: python -m pytest tests/ -q
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    # Don't deploy on forks / PRs — only direct pushes to main have the secret.
+    if: github.event_name != 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Build image in ACR
+        run: |
+          az acr build -r "$ACR_NAME" \
+            -t "$IMAGE:${{ github.sha }}" \
+            -t "$IMAGE:latest" .
+
+      - name: Point web app at the new image
+        run: |
+          az webapp config container set \
+            -n "$WEBAPP_NAME" -g "$RESOURCE_GROUP" \
+            --container-image-name "$ACR_NAME.azurecr.io/$IMAGE:${{ github.sha }}"
+
+      - name: Restart web app
+        run: az webapp restart -n "$WEBAPP_NAME" -g "$RESOURCE_GROUP"
+
+      - name: Health check
+        run: |
+          URL="https://${WEBAPP_NAME}.azurewebsites.net/healthz"
+          echo "Waiting for $URL ..."
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "$URL" || echo 000)
+            echo "attempt $i: HTTP $code"
+            if [ "$code" = "200" ]; then echo "Deployed and healthy."; exit 0; fi
+            sleep 12
+          done
+          echo "App did not become healthy in time." >&2
+          exit 1
+
+      - name: Azure logout
+        if: always()
+        run: az logout || true
